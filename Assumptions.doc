@@ -1,14 +1,17 @@
-1-  A User can only have 1 role whether it's a Bank Personnel, Loan Provider or Loan Customer
-2- A Bank Personnel user can approve/reject loan applications. 
-3- A Bank Personnel user can approve/reject loan fund applications. 
-4- Loans are added by Bank Personnel users by specifying loan min_amount, max_amount, interest_rate and duration which is in number of months. 
-5- A Bank Personnel who adds a Loan is added to the database as bank_personnel.
-6- A Loan Customer can apply for a Loan Application by specifying a Loan Object and an amount. 
-7- A Loan Provider can apply for a Loan Fund Application by specifying a certain amount. 
-8- A Bank Personnel user who approves/rejects loan applications is saved to the application in the database as bank_personnel.  
-9- A Bank Personnel user who approves/rejects loan fund applications is saved to the application in the database as bank_personnel. 
-10- A Loan Customer who applies for a Loan Application is saved to the application in the database as customer.
-11- A Loan Provider who applies for a Loan Fund Application is saved to the application in the database as customer.
-12- A Loan cannot be edited once added by a Bank Personnel. 
-13- A Role Can only be 1 of 3 values [Loan Provider, Loan Customer, Bank Personnel]
-14- For a user to sign up he must provide username, email, password and role. 
+1- A User can only have 1 role whether it's a Bank Personnel, Loan Provider or Loan Customer
+2- Bank Personnel users are created by the admin outside the system. 
+3- A Bank Personnel user can approve/reject loan applications. 
+4- A Bank Personnel user can approve/reject loan fund applications. 
+5- Loans are added by Bank Personnel users by specifying loan min_amount, max_amount, interest_rate and duration which is in number of months. 
+6- A Bank Personnel who adds a Loan is added to the database as bank_personnel.
+7- Bank Personnel Users should not have access to the Django admin panel.
+8- A Loan Customer can apply for a Loan Application by specifying a Loan Object and an amount. 
+9- A Loan Provider can apply for a Loan Fund Application by specifying a certain amount. 
+10- A Bank Personnel user who approves/rejects loan applications is saved to the application in the database as bank_personnel.  
+11- A Bank Personnel user who approves/rejects loan fund applications is saved to the application in the database as bank_personnel. 
+12- A Loan Customer who applies for a Loan Application is saved to the application in the database as customer.
+13- A Loan Provider who applies for a Loan Fund Application is saved to the application in the database as customer.
+14- A Loan cannot be edited once added by a Bank Personnel. 
+15- A Role Can only be 1 of 3 values [Loan Provider, Loan Customer, Bank Personnel]
+16- For a user to sign up he must provide username, email, password and role. 
+

@@ -20,7 +20,10 @@ class LoanFundApplicationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-from rest_framework import serializers
+class LoanPaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LoanPayment
+        fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)

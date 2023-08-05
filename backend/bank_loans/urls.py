@@ -1,19 +1,3 @@
-"""
-URL configuration for bank_loans project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
 from bank_personnel.views import *
@@ -31,6 +15,7 @@ from bank_personnel.viewsets import *
 urlpatterns = [
     path('loans/submit/', LoanViewSet.as_view({'post': 'add_loan'}), name='loans-submit'),
     path('loans/view/', LoanViewSet.as_view({'get': 'list_all_loans'}), name='loans-view'),
+    path('loans/make-payment/', LoanPaymentViewSet.as_view({'post': 'make_payment'}), name='loans-make-payment'),
     path('loan-applications/submit/', LoanApplicationViewSet.as_view({'post': 'submit_loan_application'}), name='loan-applications-submit'),
     path('loan-applications/update/<int:pk>/', LoanApplicationViewSet.as_view({'put': 'approve_or_reject_loan_application'}), name='loan-applications-update'),
     path('loan-applications/view/', LoanApplicationViewSet.as_view({'get': 'list_loan_applications'}), name='loan-applications-view'),

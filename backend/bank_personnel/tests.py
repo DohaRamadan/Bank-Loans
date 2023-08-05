@@ -3,9 +3,9 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
-from bank_personnel.models import Loan, LoanApplication, LoanFundApplication
-from bank_personnel.serializers import LoanSerializer, LoanApplicationSerializer, LoanFundApplicationSerializer
-from bank_personnel.permissions import IsLoanCustomer, IsBankPersonnel, IsLoanProvider, IsLoanCustomerOrBankPersonnel, IsLoanProviderOrBankPersonnel
+from bank_personnel.models import *
+from bank_personnel.serializers import *
+from bank_personnel.permissions import *
 
 User = get_user_model()
 
@@ -100,6 +100,11 @@ class LoanApplicationViewSetTest(APITestCase):
             password='testpassword',
             role='Loan Customer'
         )
+        self.loan_provider = User.objects.create_user(
+            username='testuser10',
+            password='testpassword',
+            role='Loan Provider'
+        )
         self.loan = Loan.objects.create(
             min_amount=1000,
             max_amount=10000,
@@ -110,6 +115,11 @@ class LoanApplicationViewSetTest(APITestCase):
             customer=self.user,
             loan=self.loan,
             amount=5000
+        )
+        self.loan_fund_application = LoanFundApplication.objects.create(
+            amount = 20000, 
+            customer = self.loan_provider,
+            status = 'Approved'
         )
         self.url = reverse('loan-applications-view')
 
@@ -237,3 +247,31 @@ class LoanFundApplicationViewSetTest(APITestCase):
         self.client.force_authenticate(user=user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class LoanViewSetTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpassword',
+            role='Loan Customer'
+        )
+
+    def test_make_payment(self):
+        self.user.available_amount = 10000
+        self.client.force_authenticate(user=self.user)
+        payment_data = {
+            'amount': 1000
+        }
+        response = self.client.post(reverse('loans-make-payment'), payment_data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        payment = LoanPayment.objects.get(id=response.data['id'])
+        self.assertEqual(payment.loan_customer, self.user)
+        self.assertEqual(payment.amount, 1000)
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.available_amount, 9000)
+
+        serialized_payment = LoanPaymentSerializer(payment)
+        self.assertEqual(response.data, serialized_payment.data)

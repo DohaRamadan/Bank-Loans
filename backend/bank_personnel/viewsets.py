@@ -7,6 +7,8 @@ from rest_framework.exceptions import PermissionDenied
 from .models import *
 from .serializers import *
 from .permissions import IsLoanCustomer, IsBankPersonnel, IsLoanProvider, IsLoanCustomerOrBankPersonnel, IsLoanProviderOrBankPersonnel
+from decimal import Decimal
+
 
 class LoanViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
@@ -19,6 +21,8 @@ class LoanViewSet(viewsets.ModelViewSet):
             permission_classes = [IsLoanCustomerOrBankPersonnel]
         elif self.action == 'add_loan':
             permission_classes = [IsBankPersonnel]
+        elif self.action == 'make_payment': 
+            permission_classes = [IsLoanCustomer] 
         return [permission() for permission in permission_classes]
     
     @action(detail=True, methods=['POST'], url_path='submit')
@@ -37,7 +41,6 @@ class LoanViewSet(viewsets.ModelViewSet):
         loans = Loan.objects.all()
         serializer = self.get_serializer(loans, many=True)
         return Response(serializer.data)
-
     
 
 class LoanApplicationViewSet(viewsets.ModelViewSet):
@@ -46,6 +49,7 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
     queryset = LoanApplication.objects.all()
     serializer_class = LoanApplicationSerializer
 
+    
     def get_permissions(self):
         if self.action == 'submit_loan_application':
             permission_classes = [IsLoanCustomer]
@@ -75,6 +79,10 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
                 raise PermissionDenied("You're not authorized to perform this action")
             loan_application.status = status
             loan_application.bank_personnel = request.user
+            if status == 'Approved':
+                loan_customer = loan_application.customer
+                loan_customer.available_amount += loan_application.amount
+                loan_customer.save()
             loan_application.save()
             serializer = self.get_serializer(loan_application)
             return Response(serializer.data)
@@ -138,3 +146,32 @@ class LoanFundApplicationViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("You're not authorized to perform this action")
         serializer = self.get_serializer(loan_fund_applications, many=True)
         return Response(serializer.data)
+
+
+
+class LoanPaymentViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = LoanPayment.objects.all()
+    serializer_class = LoanPaymentSerializer
+
+    @action(detail=True, methods=['POST'], permission_classes=[IsLoanCustomer])
+    def make_payment(self, request):
+        amount = Decimal(request.data.get('amount', 0))
+        if amount <= 0:
+            return Response({'error': 'Invalid payment amount.'}, status=status.HTTP_400_BAD_REQUEST)
+        if amount > request.user.available_amount:
+            return Response({'error': 'Payment amount exceeds the remaining loan amount.'},
+								status=status.HTTP_400_BAD_REQUEST)
+        loan_customer = request.user
+        loan_customer.available_amount -= amount
+        loan_customer.save()
+        loan_payment = LoanPayment.objects.create(
+            loan_customer=loan_customer,
+            amount=amount
+        )
+        serializer = self.get_serializer(loan_payment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+        

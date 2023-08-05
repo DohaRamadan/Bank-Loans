@@ -5,6 +5,9 @@ from django.contrib.auth.models import PermissionsMixin
 from django.conf import settings  
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings  
+from django.core.exceptions import ValidationError
+from django.db.models import Sum
+
 
 
 STATUS_CHOICES = (
@@ -23,6 +26,7 @@ class CustomUser(AbstractUser, PermissionsMixin):
 
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
     is_admin = models.BooleanField(default=False)
+    available_amount = models.DecimalField(max_digits=18, decimal_places=3, default=0)
 
     groups = models.ManyToManyField(
         'auth.Group',
@@ -48,6 +52,7 @@ class Loan(models.Model):
     interest_rate = models.DecimalField(null=False, max_digits=18, decimal_places=3)
     duration = models.IntegerField(null=False) #in months
 
+
 class LoanApplication(models.Model):
     bank_personnel = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="loan_applications_bank_personnel", on_delete=models.CASCADE, default=None, null=True)
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="loan_applications_customer", on_delete=models.CASCADE)
@@ -55,11 +60,41 @@ class LoanApplication(models.Model):
     amount = models.DecimalField(null=False, max_digits=18, decimal_places=3)
     status = models.CharField(max_length=50, null=False, choices=STATUS_CHOICES, default="Pending")
 
+    def save(self, *args, **kwargs):
+        total_loans = LoanApplication.objects.filter(status='Approved').aggregate(Sum('amount'))['amount__sum'] or 0
+        total_funds = LoanFundApplication.objects.filter(status='Approved').aggregate(Sum('amount'))['amount__sum'] or 0
+
+        if self.status == 'Approved':
+            total_loans += self.amount
+
+        if total_loans > total_funds:
+            raise ValidationError("Total loans exceed total funds.")
+
+        super().save(*args, **kwargs)
+
 class LoanFundApplication(models.Model):
     bank_personnel = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="loan_fund_applications_bank_personnel", on_delete=models.CASCADE, null=True)
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="loan_fund_applications_customer", on_delete=models.CASCADE)
     amount = models.DecimalField(null=False, max_digits=18, decimal_places=3)
     status = models.CharField(max_length=50, null=False, choices=STATUS_CHOICES, default="Pending")
+
+    def save(self, *args, **kwargs):
+        total_loans = LoanApplication.objects.filter(status='Approved').aggregate(Sum('amount'))['amount__sum'] or 0
+        total_funds = LoanFundApplication.objects.filter(status='Approved').aggregate(Sum('amount'))['amount__sum'] or 0
+
+        if self.status == 'Approved':
+            total_funds += self.amount
+
+        if total_loans > total_funds:
+            raise ValidationError("Total loans exceed total funds.")
+
+        super().save(*args, **kwargs)
+
+
+class LoanPayment(models.Model):
+    loan_customer = models.ForeignKey(settings.AUTH_USER_MODEL,related_name="loan_payment_loan_customer" , on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=18, decimal_places=3)
+    payment_date = models.DateField(auto_now_add=True)
     
 
 
