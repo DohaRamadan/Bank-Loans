@@ -29,7 +29,4 @@ class IsLoanProviderOrBankPersonnel(BasePermission):
         return obj.customer == request.user
     
 
-
-    
-
     
