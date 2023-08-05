@@ -155,7 +155,12 @@ class LoanPaymentViewSet(viewsets.ModelViewSet):
     queryset = LoanPayment.objects.all()
     serializer_class = LoanPaymentSerializer
 
-    @action(detail=True, methods=['POST'], permission_classes=[IsLoanCustomer])
+    def get_permissions(self):
+        if self.action == 'make_payment':
+            permission_classes = [IsLoanCustomer]
+        return [permission() for permission in permission_classes]
+
+    @action(detail=True, methods=['POST'])
     def make_payment(self, request):
         amount = Decimal(request.data.get('amount', 0))
         if amount <= 0:
