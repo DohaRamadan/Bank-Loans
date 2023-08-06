@@ -1,16 +1,16 @@
 <template>
-<v-container class="error-page">
-    <v-layout align-center justify-center>
-        <v-flex xs12 sm8 md6>
+<v-container class="error-page" fluid>
+    <v-row align="center" justify="center">
+        <v-col cols="12" sm="8" md="6">
             <v-card outlined class="error-card">
                 <v-card-title class="error-title">Error {{ code }}</v-card-title>
                 <v-card-text class="error-message">An error occurred. Please try again later.</v-card-text>
                 <v-card-actions>
-                    <v-btn color="primary" to="/" outlined>Go Home</v-btn>
+                    <v-btn color="primary" outlined @click="$router.go(-1)">Go Back</v-btn>
                 </v-card-actions>
             </v-card>
-        </v-flex>
-    </v-layout>
+        </v-col>
+    </v-row>
 </v-container>
 </template>
 

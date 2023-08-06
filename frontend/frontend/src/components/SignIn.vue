@@ -23,6 +23,7 @@ export default {
             password: '',
         };
     },
+    setup() {},
     methods: {
         signin(event) {
             event.preventDefault();
@@ -37,13 +38,10 @@ export default {
                     console.log(response.data);
                     // Handle success response
                     if (response.data.key) {
-                        // Save the token in the local storage
-                        const token = response.data.key
-                        this.$store.commit('setToken', token)
-                        axios.defaults.headers.common['Authorization'] = "Token " + token
+                        const token = response.data.key;
+                        this.$store.commit('setToken', token);
+                        axios.defaults.headers.common['Authorization'] = "Token " + token;
                         localStorage.setItem('token', token);
-                        // Redirect the user to the main page
-                        // this.$router.push('/dashboard');
 
                         axios.get('/get-user-role/')
                             .then(roleResponse => {
@@ -54,31 +52,32 @@ export default {
 
                                 // Redirect the user
                                 if (role === "Loan Customer") {
-                                    this.$router.push('/loan-applications/view')
+                                    this.$router.push('/loan-applications/view').then(() => { this.$router.go() })
                                 } else if (role === 'Loan Provider') {
-                                    this.$router.push('/loan-fund-applications/view')
+                                    this.$router.push('/loan-fund-applications/view').then(() => { this.$router.go() })
                                 } else if (role === 'Bank Personnel') {
-                                    this.$router.push('/loans/view')
+                                    this.$router.push('/loans/view').then(() => { this.$router.go() })
                                 }
                             })
                             .catch(error => {
-                                console.error(error);
-                                // Handle error response
-                                this.$toast.error("Failed to retrieve user role.");
+                                console.error(error.response && error.response.data ? error.response.data.error : error);
+                                this.handleRequestError(error);
                             });
                     }
                 })
                 .catch(error => {
-                    console.error(error.response.data);
-                    // Handle error response
-                    this.$toast.error(error.response.data.error);
-                    this.$router.push({
-                        name: 'error',
-                        params: {
-                            code: error.response.status
-                        }
-                    });
+                    console.error(error.response && error.response.data ? error.response.data.error : error);
+                    this.handleRequestError(error);
                 });
+        },
+        handleRequestError(error) {
+            const statusCode = error.response ? error.response.status : 500;
+            this.$router.push({
+                name: 'ErrorPage',
+                params: {
+                    code: statusCode
+                }
+            });
         }
     }
 };

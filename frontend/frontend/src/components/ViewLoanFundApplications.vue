@@ -46,14 +46,12 @@ export default {
                     },
                 })
                 .then(response => {
-                    // Handle success response and update the loan fund applications list
                     this.loanFundApplications = response.data;
                 })
                 .catch(error => {
                     // Handle error response
-                    this.$toast.error(error.response.data.error);
                     this.$router.push({
-                        name: 'error',
+                        name: 'ErrorPage',
                         params: {
                             code: error.response.status
                         }

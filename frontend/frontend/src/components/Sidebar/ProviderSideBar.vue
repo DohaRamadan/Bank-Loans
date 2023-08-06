@@ -21,6 +21,7 @@
 </v-navigation-drawer>
 </template>
 
+  
 <script>
 import axios from 'axios';
 export default {
@@ -46,26 +47,38 @@ export default {
             // Send request to '/logout/' API endpoint
             // After the request is successful, redirect the user to the 'signin/' route
             // Example:
-            axios.post('/logout/')
+            axios
+                .post('/logout/')
                 .then(() => {
-                    localStorage.removeItem('token')
-                    localStorage.removeItem('role')
-                    // window.location.reload();
-                    this.$router.push('/')
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('role');
+                    this.$router.push('/').then(() => {
+                        this.$router.go();
+                    });
                 })
                 .catch((error) => {
                     console.error('Logout request failed', error);
+                    const statusCode = error.response ? error.response.status : 500;
+                    // Handle error response
+                    this.$router.push({
+                        name: 'ErrorPage',
+                        params: {
+                            code: statusCode,
+                        },
+                    });
                 });
-        }
-    }
+        },
+    },
 };
 </script>
 
+  
 <style scoped>
 .sidebar {
     background-color: #f0f0f0;
     box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
-    width: 250px;
+    width: 900px;
+
 }
 
 .sidebar .v-list-item {

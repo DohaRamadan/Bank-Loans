@@ -51,24 +51,22 @@ export default {
                 duration: this.duration,
             };
 
-            // Make an API call to submit the loan
             axios
                 .post('/loans/submit/', loan, {
                     headers: {
                         Authorization: `Token ${localStorage.getItem('token')}`,
                     },
                 })
-                .then(response => {
-                    // Handle success response and update the loans list
-                    this.loans.push(response.data);
+                .then(() => {
+                    this.$router.push('/loans/view')
                 })
                 .catch(error => {
+                    const statusCode = error.response ? error.response.status : 500;
                     // Handle error response
-                    this.$toast.error(error.response.data.error);
                     this.$router.push({
-                        name: 'error',
+                        name: 'ErrorPage',
                         params: {
-                            code: error.response.status
+                            code: statusCode
                         }
                     });
                 });

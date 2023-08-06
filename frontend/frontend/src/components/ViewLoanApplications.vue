@@ -56,17 +56,17 @@ export default {
                 })
                 .catch(error => {
                     // Handle error response
-                    this.$toast.error(error.response.data.error);
+                    const statusCode = error.response ? error.response.status : 500;
+                    // Handle error response
                     this.$router.push({
-                        name: 'error',
+                        name: 'ErrorPage',
                         params: {
-                            code: error.response.status
+                            code: statusCode
                         }
                     });
                 });
         },
         viewLoanApplication(loanApplication) {
-            // Redirect to the LoanApplicationDetails component with the selected loan application
             this.$router.push({
                 name: 'LoanApplicationDetails',
                 params: {

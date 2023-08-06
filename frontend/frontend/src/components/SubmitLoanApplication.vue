@@ -27,8 +27,8 @@ export default {
         };
     },
     components: {
-        ViewLoans, 
-        },
+        ViewLoans,
+    },
     methods: {
         submitLoanApplication() {
             const loanApplication = {
@@ -42,17 +42,16 @@ export default {
                         Authorization: `Token ${localStorage.getItem('token')}`
                     }
                 })
-                .then(response => {
-                    // Handle success response and update the loan applications list
-                    this.loanApplications.push(response.data);
+                .then(() => {
+                    this.$router.push('/loan-applications/view')
                 })
                 .catch(error => {
                     // Handle error response
-                    this.$toast.error(error.response.data.error);
+                    const statusCode = error.response ? error.response.status : 500;
                     this.$router.push({
-                        name: 'error',
+                        name: 'ErrorPage',
                         params: {
-                            code: error.response.status
+                            code: statusCode
                         }
                     });
                 });

@@ -6,6 +6,14 @@ from rest_framework.authtoken.models import Token
 from bank_personnel.models import *
 from bank_personnel.serializers import *
 from bank_personnel.permissions import *
+from django.contrib.auth.models import User
+from django.test import TestCase
+from rest_framework.test import APIRequestFactory
+from rest_framework.test import force_authenticate
+from .views import getRole, getLoanApplication, getLoanFundApplication
+from rest_framework import status
+
+
 
 User = get_user_model()
 
@@ -275,3 +283,83 @@ class LoanViewSetTest(APITestCase):
 
         serialized_payment = LoanPaymentSerializer(payment)
         self.assertEqual(response.data, serialized_payment.data)
+
+
+class ViewsTestCase(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.loan = Loan.objects.create(
+            min_amount=1000,
+            max_amount=10000,
+            interest_rate=5,
+            duration=12
+        )
+    
+    def test_getRole_authenticated_user(self):
+        request = self.factory.get('/role/')
+        force_authenticate(request, user=self.user)
+        
+        response = getRole(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'role': self.user.role})
+    
+    def test_getRole_unauthenticated_user(self):
+        request = self.factory.get('/role/')
+        
+        response = getRole(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'error': 'user not authenticated'})
+    
+    def test_getLoanApplication_existing_application(self):
+        loan_application = LoanApplication.objects.create(id=1, customer= self.user, loan = self.loan, amount = 1000)
+        
+        request = self.factory.get('/loan_application/1/')
+        
+        response = getLoanApplication(request, pk=1)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, LoanApplicationSerializer(loan_application).data)
+    
+    def test_getLoanApplication_nonexisting_application(self):
+        request = self.factory.get('/loan_application/1/')
+        
+        response = getLoanApplication(request, pk=1)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'error': 'Loan Application does not exist'})
+    
+    def test_getLoanFundApplication_existing_application(self):
+        loan_fund_application = LoanFundApplication.objects.create(id=1, customer=self.user, amount = 10000)
+        
+        request = self.factory.get('/loan_fund_application/1/')
+        
+        response = getLoanFundApplication(request, pk=1)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, LoanFundApplicationSerializer(loan_fund_application).data)
+    
+    def test_getLoanFundApplication_nonexisting_application(self):
+        request = self.factory.get('/loan_fund_application/1/')
+        
+        response = getLoanFundApplication(request, pk=1)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'error': 'Loan Fund Application does not exist'})
+
+
+
+
+
+class GetAvailableAmountTestCase(APITestCase):
+
+    def test_get_available_amount_authenticated(self):
+        user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/get-available-amount', follow=True)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.data, {'available_amount': user.available_amount})
+
+    def test_get_available_amount_unauthenticated(self):
+        response = self.client.get('/get-available-amount', follow=True)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.data, {'error': 'user not authenticated'})

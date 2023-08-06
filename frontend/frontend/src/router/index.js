@@ -14,6 +14,8 @@ import AddLoan from '@/components/AddLoan.vue'
 import Welcome from '@/components/Welcome.vue'
 import LoanApplicationDetails from '@/components/LoanApplicationDetails.vue'
 import LoanFundApplicationDetails from '@/components/LoanFundApplicationDetails.vue'
+import ErrorPage from '@/components/ErrorPage.vue'
+
 const routes = [
   {
     path: '/',
@@ -78,6 +80,11 @@ const routes = [
         path: '/signup',
         name: 'Signup',
         component: SignUp,
+      },
+      {
+        path: '/error',
+        name: 'ErrorPage',
+        component: ErrorPage,
       },
     ],
   },

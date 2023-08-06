@@ -52,19 +52,23 @@ export default {
     },
     methods: {
         logout() {
-            // Send request to '/logout/' API endpoint
-            // After the request is successful, redirect the user to the 'signin/' route
-            // Example:
             axios.post('/logout/')
               .then(() => {
                 localStorage.removeItem('token')
                 localStorage.removeItem('role')
-                // window.location.reload();
-                this.$router.push('/')
+                this.$router.push('/').then(() => { this.$router.go() })
 
               })
               .catch((error) => {
                 console.error('Logout request failed', error);
+                const statusCode = error.response ? error.response.status : 500;
+                    // Handle error response
+                    this.$router.push({
+                        name: 'ErrorPage',
+                        params: {
+                            code: statusCode
+                        }
+                    });
               });
         }
     }

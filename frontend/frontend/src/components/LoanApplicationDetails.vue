@@ -29,7 +29,6 @@
 </div>
 </template>
 
-  
 <script>
 import axios from 'axios';
 
@@ -59,11 +58,12 @@ export default {
                 })
                 .catch(error => {
                     // Handle error response
-                    this.$toast.error(error.response.data.error);
+                    const statusCode = error.response ? error.response.status : 500;
+                    // Handle error response
                     this.$router.push({
-                        name: 'error',
+                        name: 'ErrorPage',
                         params: {
-                            code: error.response.status
+                            code: statusCode
                         }
                     });
                 });
@@ -71,7 +71,6 @@ export default {
         updateLoanApplication() {
             const loanApplicationId = this.$route.params.loanApplicationId;
 
-            // Make an API call to update the loan application status
             axios
                 .put(`/loan-applications/update/${loanApplicationId}/`, {
                     status: this.selectedStatus,
@@ -81,13 +80,17 @@ export default {
                     },
                 })
                 .then(() => {
-                    // Handle success response and show a success message
-                    this.$toast.success('Loan application updated successfully.');
                     this.loanApplication.status = this.selectedStatus;
+                    this.$router.push('/loan-applications/view')
                 })
                 .catch(error => {
-                    // Handle error response
-                    this.$toast.error(error.response.data.error);
+                    const statusCode = error.response ? error.response.status : 500;
+                    this.$router.push({
+                        name: 'ErrorPage',
+                        params: {
+                            code: statusCode
+                        }
+                    });
                 });
         },
     },

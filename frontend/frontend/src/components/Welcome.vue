@@ -2,7 +2,7 @@
 <v-container fluid>
     <v-row justify="center" align="center">
         <v-col cols="12" md="8" lg="6">
-            <v-card elevation="3">
+            <v-card elevation="3" class="welcome-card">
                 <v-card-title class="text-center">
                     <h2 class="display-1">Welcome to Bank Loans!</h2>
                 </v-card-title>
@@ -41,6 +41,12 @@ export default {
 
   
 <style scoped>
+.welcome-card {
+    max-width: 400px;
+    text-align: center;
+    padding: 24px;
+}
+
 .text-center {
     text-align: center;
 }

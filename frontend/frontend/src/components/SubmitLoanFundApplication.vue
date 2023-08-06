@@ -1,72 +1,77 @@
 <template>
-    <v-container class="submit-loan-container">
-      <v-card class="submit-loan-card">
+<v-container class="submit-loan-container">
+    <v-card class="submit-loan-card">
         <v-card-title class="submit-loan-title">Submit Loan Fund Application</v-card-title>
         <v-card-text>
-          <v-form @submit.prevent="submitLoanApplication">
-            <v-text-field v-model="amount" label="Amount" required></v-text-field>
-            <v-btn type="submit" color="primary">Submit Loan Fund Application</v-btn>
-          </v-form>
+            <v-form @submit.prevent="submitLoanApplication">
+                <v-text-field v-model="amount" label="Amount" required></v-text-field>
+                <v-btn type="submit" color="primary">Submit Loan Fund Application</v-btn>
+            </v-form>
         </v-card-text>
-      </v-card>
-    </v-container>
-  </template>
+    </v-card>
+</v-container>
+</template>
+
   
-  <script>
-  import axios from 'axios';
-  
-  export default {
+<script>
+import axios from 'axios';
+
+export default {
     data() {
-      return {
-        amount: ''
-      };
+        return {
+            amount: ''
+        };
     },
     methods: {
-      submitLoanApplication() {
-        const loanApplication = {
-          amount: this.amount
-        };
-  
-        axios
-          .post('/loan-applications/submit/', loanApplication, {
-            headers: {
-              Authorization: `Token ${localStorage.getItem('token')}`
-            }
-          })
-          .then(response => {
-            // Handle success response and update the loan applications list
-            this.loanApplications.push(response.data);
-          })
-          .catch(error => {
-            // Handle error response
-            // this.$toast.error(error.response.data.error);
-            this.$router.push({ name: 'error', params: { code: error.response.detail } });
-          });
-  
-        // Clear the form field
-        this.amount = '';
-      }
+        submitLoanApplication() {
+            const loanFundApplication = {
+                amount: this.amount
+            };
+
+            axios
+                .post('/loan-fund-applications/submit/', loanFundApplication, {
+                    headers: {
+                        Authorization: `Token ${localStorage.getItem('token')}`
+                    }
+                })
+                .then(() => {
+                    this.$router.push('/loan-fund-applications/view')
+                })
+                .catch(error => {
+                    const statusCode = error.response ? error.response.status : 500;
+                    this.$router.push({
+                        name: 'ErrorPage',
+                        params: {
+                            code: statusCode
+                        }
+                    });
+                });
+
+            // Clear the form field
+            this.amount = '';
+        }
     }
-  };
-  </script>
+};
+</script>
+
   
-  <style scoped>
-  .submit-loan-container {
+<style scoped>
+.submit-loan-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-  }
-  
-  .submit-loan-card {
+}
+
+.submit-loan-card {
     max-width: 400px;
     width: 100%;
     padding: 24px;
-  }
-  
-  .submit-loan-title {
+}
+
+.submit-loan-title {
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 16px;
-  }
-  </style>
+}
+</style>
