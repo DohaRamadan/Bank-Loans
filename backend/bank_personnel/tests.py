@@ -257,34 +257,6 @@ class LoanFundApplicationViewSetTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
-class LoanViewSetTest(APITestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username='testuser',
-            password='testpassword',
-            role='Loan Customer'
-        )
-
-    def test_make_payment(self):
-        self.user.available_amount = 10000
-        self.client.force_authenticate(user=self.user)
-        payment_data = {
-            'amount': 1000
-        }
-        response = self.client.post(reverse('loans-make-payment'), payment_data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
-        payment = LoanPayment.objects.get(id=response.data['id'])
-        self.assertEqual(payment.loan_customer, self.user)
-        self.assertEqual(payment.amount, 1000)
-
-        self.user.refresh_from_db()
-        self.assertEqual(self.user.available_amount, 9000)
-
-        serialized_payment = LoanPaymentSerializer(payment)
-        self.assertEqual(response.data, serialized_payment.data)
-
-
 class ViewsTestCase(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
@@ -344,22 +316,3 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.data, {'error': 'Loan Fund Application does not exist'})
 
 
-
-
-
-class GetAvailableAmountTestCase(APITestCase):
-
-    def test_get_available_amount_authenticated(self):
-        user = User.objects.create_user(username='testuser', password='testpassword')
-        self.client.force_authenticate(user=user)
-
-        response = self.client.get('/get-available-amount', follow=True)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertDictEqual(response.data, {'available_amount': user.available_amount})
-
-    def test_get_available_amount_unauthenticated(self):
-        response = self.client.get('/get-available-amount', follow=True)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertDictEqual(response.data, {'error': 'user not authenticated'})

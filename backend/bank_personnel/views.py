@@ -73,11 +73,11 @@ def getLoanFundApplication(request, pk):
     except:
         return Response({'error': 'Loan Fund Application does not exist'})
     
-# get user available_amount 
+# get user paid_amount 
 @api_view(['GET'])
-def getAvailableAmount(request):
+def getLoanAmount(request):
     if request.user.is_authenticated:
-        return Response({'available_amount': request.user.available_amount})
+        return Response({'loan_amount': request.user.loan_amount})
     else:
         return Response({'error': 'user not authenticated'})
 

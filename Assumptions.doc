@@ -14,4 +14,5 @@
 14- A Loan cannot be edited once added by a Bank Personnel. 
 15- A Role Can only be 1 of 3 values [Loan Provider, Loan Customer, Bank Personnel]
 16- For a user to sign up he must provide username, email, password and role. 
+17- Payment is done outside the system. 
 

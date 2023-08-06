@@ -18,7 +18,7 @@
     </v-form>
     <div>
         <v-alert v-if="showSuccessAlert" elevation="4" prominent type="success">
-            Success! Your available amount is {{ availableAmount }}$
+            Success! Your loan amount is {{ laonAmount }}$
         </v-alert>
     </div>
 
@@ -34,7 +34,7 @@ export default {
             loan: '',
             amount: '',
             showSuccessAlert: false,
-            availableAmount: null,
+            laonAmount: null,
             errorMessage: ''
         };
     },
@@ -55,14 +55,14 @@ export default {
 
                     // Make API call to get available amount
                     axios
-                        .get('/get-available-amount', {
+                        .get('/get-loan-amount', {
                             headers: {
                                 Authorization: `Token ${localStorage.getItem('token')}`,
                             },
                         })
                         .then(response => {
                             console.log(response)
-                            this.availableAmount = response.data.available_amount;
+                            this.laonAmount = response.data.loan_amount;
                             this.showSuccessAlert = true;
                         })
                         .catch(error => {

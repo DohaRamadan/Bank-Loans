@@ -81,7 +81,7 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
             loan_application.bank_personnel = request.user
             if status == 'Approved':
                 loan_customer = loan_application.customer
-                loan_customer.available_amount += loan_application.amount
+                loan_customer.loan_amount += loan_application.amount
                 loan_customer.save()
             loan_application.save()
             serializer = self.get_serializer(loan_application)
@@ -165,11 +165,12 @@ class LoanPaymentViewSet(viewsets.ModelViewSet):
         amount = Decimal(request.data.get('amount', 0))
         if amount <= 0:
             return Response({'error': 'Invalid payment amount.'}, status=status.HTTP_400_BAD_REQUEST)
-        if amount > request.user.available_amount:
+        if amount > request.user.loan_amount:
             return Response({'error': 'Payment amount exceeds the remaining loan amount.'},
 								status=status.HTTP_400_BAD_REQUEST)
         loan_customer = request.user
-        loan_customer.available_amount -= amount
+        loan_customer.paid_amount += amount
+        loan_customer.loan_amount -= amount
         loan_customer.save()
         loan_payment = LoanPayment.objects.create(
             loan_customer=loan_customer,

@@ -26,7 +26,8 @@ class CustomUser(AbstractUser, PermissionsMixin):
 
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
     is_admin = models.BooleanField(default=False)
-    available_amount = models.DecimalField(max_digits=18, decimal_places=3, default=0)
+    paid_amount = models.DecimalField(max_digits=18, decimal_places=3, default=0)
+    loan_amount = models.DecimalField(max_digits=18, decimal_places=3, default=0)
 
     groups = models.ManyToManyField(
         'auth.Group',
@@ -64,11 +65,8 @@ class LoanApplication(models.Model):
     status = models.CharField(max_length=50, null=False, choices=STATUS_CHOICES, default="Pending")
 
     def save(self, *args, **kwargs):
-        total_loans = LoanApplication.objects.filter(status='Approved').aggregate(Sum('amount'))['amount__sum'] or 0
+        total_loans = CustomUser.objects.aggregate(Sum('loan_amount'))['loan_amount__sum'] or 0
         total_funds = LoanFundApplication.objects.filter(status='Approved').aggregate(Sum('amount'))['amount__sum'] or 0
-
-        if self.status == 'Approved':
-            total_loans += self.amount
 
         if total_loans > total_funds:
             raise ValidationError("Total loans exceed total funds.")
@@ -82,12 +80,12 @@ class LoanFundApplication(models.Model):
     status = models.CharField(max_length=50, null=False, choices=STATUS_CHOICES, default="Pending")
 
     def save(self, *args, **kwargs):
-        total_loans = LoanApplication.objects.filter(status='Approved').aggregate(Sum('amount'))['amount__sum'] or 0
+        total_loans = CustomUser.objects.aggregate(Sum('loan_amount'))['loan_amount__sum'] or 0
         total_funds = LoanFundApplication.objects.filter(status='Approved').aggregate(Sum('amount'))['amount__sum'] or 0
 
         if self.status == 'Approved':
             total_funds += self.amount
-
+            
         if total_loans > total_funds:
             raise ValidationError("Total loans exceed total funds.")
 
