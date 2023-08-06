@@ -45,3 +45,30 @@ class SigninView(APIView):
             return Response({'token': token.key})
         else:
             return Response({'error': 'Invalid credentials'}, status=401)
+        
+@api_view(['GET'])
+def getRole(request):
+    if request.user.is_authenticated:
+        return Response({'role': request.user.role})
+    else:
+        return Response({'error': 'user not authenticated'})
+
+# get Loan Application by ID
+@api_view(['GET'])
+def getLoanApplication(request, pk):
+    try:
+        loanApplication = LoanApplication.objects.get(id=pk)
+        serializer = LoanApplicationSerializer(loanApplication, many=False)
+        return Response(serializer.data)
+    except:
+        return Response({'error': 'Loan Application does not exist'})
+    
+# get Loan Fund Application by ID
+@api_view(['GET'])
+def getLoanFundApplication(request, pk):
+    try:
+        loanFundApplication = LoanFundApplication.objects.get(id=pk)
+        serializer = LoanFundApplicationSerializer(loanFundApplication, many=False)
+        return Response(serializer.data)
+    except:
+        return Response({'error': 'Loan Fund Application does not exist'})

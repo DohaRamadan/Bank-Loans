@@ -27,4 +27,7 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name='logout'),
     path("user/", UserDetailsView.as_view()), 
     path('admin/', admin.site.urls),
+    path('get-user-role/', views.getRole), 
+    path('loan-applications/get/<int:pk>/', views.getLoanApplication),
+    path('loan-fund-applications/get/<int:pk>/', views.getLoanFundApplication), 
 ]

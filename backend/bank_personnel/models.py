@@ -44,12 +44,15 @@ class CustomUser(AbstractUser, PermissionsMixin):
         related_query_name='customuser',
     )
 
+    def __str__(self) -> str:
+        return self.username
+
 
 
 class Loan(models.Model):
-    min_amount = models.DecimalField(null=False, max_digits=18, decimal_places=3)
-    max_amount = models.DecimalField(null=False, max_digits=18, decimal_places=3)
-    interest_rate = models.DecimalField(null=False, max_digits=18, decimal_places=3)
+    min_amount = models.DecimalField(null=False, max_digits=18, decimal_places=2)
+    max_amount = models.DecimalField(null=False, max_digits=18, decimal_places=2)
+    interest_rate = models.DecimalField(null=False, max_digits=18, decimal_places=2)
     duration = models.IntegerField(null=False) #in months
 
 
@@ -75,7 +78,7 @@ class LoanApplication(models.Model):
 class LoanFundApplication(models.Model):
     bank_personnel = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="loan_fund_applications_bank_personnel", on_delete=models.CASCADE, null=True)
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="loan_fund_applications_customer", on_delete=models.CASCADE)
-    amount = models.DecimalField(null=False, max_digits=18, decimal_places=3)
+    amount = models.DecimalField(null=False, max_digits=18, decimal_places=2)
     status = models.CharField(max_length=50, null=False, choices=STATUS_CHOICES, default="Pending")
 
     def save(self, *args, **kwargs):
@@ -93,7 +96,7 @@ class LoanFundApplication(models.Model):
 
 class LoanPayment(models.Model):
     loan_customer = models.ForeignKey(settings.AUTH_USER_MODEL,related_name="loan_payment_loan_customer" , on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=18, decimal_places=3)
+    amount = models.DecimalField(max_digits=18, decimal_places=2)
     payment_date = models.DateField(auto_now_add=True)
     
 
