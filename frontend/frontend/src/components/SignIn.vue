@@ -52,13 +52,13 @@ export default {
                                 localStorage.setItem('role', role.split(" ").join(""));
                                 console.log(localStorage.getItem('role'));
 
-                                // Redirect the user to the main page
+                                // Redirect the user
                                 if (role === "Loan Customer") {
-                                    this.$router.push('loan-applications/view')
+                                    this.$router.push('/loan-applications/view')
                                 } else if (role === 'Loan Provider') {
-                                    this.$router.push('loan-fund-applications/view')
+                                    this.$router.push('/loan-fund-applications/view')
                                 } else if (role === 'Bank Personnel') {
-                                    this.$router.push('loans/view')
+                                    this.$router.push('/loans/view')
                                 }
                             })
                             .catch(error => {

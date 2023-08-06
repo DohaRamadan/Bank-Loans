@@ -39,7 +39,7 @@ export default {
                 },
                 {
                     title: 'View Loan Application',
-                    icon: 'mdi-file-document',
+                    icon: 'mdi-view-list',
                     route: '/loan-applications/view'
                 },
                 {
@@ -61,6 +61,7 @@ export default {
                 localStorage.removeItem('role')
                 // window.location.reload();
                 this.$router.push('/')
+
               })
               .catch((error) => {
                 console.error('Logout request failed', error);

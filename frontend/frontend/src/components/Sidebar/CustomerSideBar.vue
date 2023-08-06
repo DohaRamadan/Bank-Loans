@@ -38,7 +38,7 @@ export default {
                 },
                 {
                     title: 'Make Loan Payment',
-                    icon: 'mdi-view-list',
+                    icon: 'mdi-file-document',
                     route: '/loans/make-payment'
                 }
             ]

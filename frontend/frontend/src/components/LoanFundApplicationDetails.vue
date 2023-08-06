@@ -80,7 +80,7 @@
                             Authorization: `Token ${localStorage.getItem('token')}`,
                         },
                     })
-                    .then(response => {
+                    .then(() => {
                         // Handle success response and show a success message
                         this.$toast.success('Loan application updated successfully.');
                         this.loanFundApplication.status = this.selectedStatus;
