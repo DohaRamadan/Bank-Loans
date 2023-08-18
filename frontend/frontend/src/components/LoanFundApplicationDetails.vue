@@ -22,7 +22,7 @@
                     <v-list-item-content>{{ loanFundApplication.customer }}</v-list-item-content>
                 </v-list-item>
             </v-list>
-            <v-select v-model="selectedStatus" :items="statusOptions" label="Loan Status" outlined dense></v-select>
+            <v-select v-model="selectedStatus" :items="statusOptions" label="Loan Status" outlined dense :readonly="loanFundApplication.status === 'Approved' || loanFundApplication.status === 'Rejected'"></v-select>
             <v-btn color="primary" @click="updateLoanFundApplication">Update</v-btn>
         </v-card-text>
     </v-card>
@@ -56,7 +56,12 @@ export default {
                 })
                 .catch(error => {
                     let message = error.response.data.error
-                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
+                    this.$router.push({
+                        name: 'ErrorPage',
+                        query: {
+                            errorMessage: message
+                        }
+                    })
                 });
         },
         updateLoanFundApplication() {
@@ -76,7 +81,12 @@ export default {
                 })
                 .catch(error => {
                     let message = error.response.data.error
-                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
+                    this.$router.push({
+                        name: 'ErrorPage',
+                        query: {
+                            errorMessage: message
+                        }
+                    })
                 });
         },
     },

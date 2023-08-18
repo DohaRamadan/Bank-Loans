@@ -72,14 +72,14 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['PUT'], url_path='update')
     def approve_or_reject_loan_application(self, request, pk=None):
         loan_application = self.get_object()
-        status = request.data.get('status')
-        if status in ['Approved', 'Rejected']:
+        loan_status = request.data.get('status')
+        if loan_status in ['Approved', 'Rejected']:
             if request.user.role != 'Bank Personnel':
                 raise PermissionDenied("You're not authorized to perform this action")
-            loan_application.status = status
+            loan_application.status = loan_status
             loan_application.bank_personnel = request.user
             loan_customer = loan_application.customer
-            if status == 'Approved':
+            if loan_status == 'Approved':
                 loan_customer.loan_amount += loan_application.amount
                 loan_customer.save()
             try:
@@ -87,7 +87,7 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
             except ValidationError as e:
                 loan_customer.loan_amount -= loan_application.amount
                 loan_customer.save()
-                return Response({'error': e.message_dict}, status=status.HTTP_400_BAD_REQUEST)            
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)            
 
             serializer = self.get_serializer(loan_application)
             return Response(serializer.data)

@@ -16,7 +16,7 @@ class LoanSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
-        loan = Loan.objects.create_user(
+        loan = Loan.objects.create(
             min_amount=validated_data['min_amount'],
             max_amount=validated_data['max_amount'],
             interest_rate=validated_data['interest_rate'],
@@ -28,7 +28,7 @@ class LoanSerializer(serializers.ModelSerializer):
 class LoanApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoanApplication
-        fields = ['customer', 'loan', 'amount', 'status', 'bank_personnel']
+        fields =  '__all__'
 
     def validate(self, data):
         loan = Loan.objects.filter(id=data['loan'].id).first()

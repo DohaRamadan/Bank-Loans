@@ -22,7 +22,7 @@
                     <v-list-item-content>{{ loanApplication.customer }}</v-list-item-content>
                 </v-list-item>
             </v-list>
-            <v-select v-model="selectedStatus" :items="statusOptions" label="Loan Status" outlined dense></v-select>
+            <v-select v-model="selectedStatus" :items="statusOptions" label="Loan Status" outlined dense :readonly="loanApplication.status === 'Approved' || loanApplication.status === 'Rejected'"></v-select>
             <v-btn color="primary" @click="updateLoanApplication">Update</v-btn>
         </v-card-text>
     </v-card>
@@ -57,6 +57,7 @@ export default {
                     this.selectedStatus = response.data.status;
                 })
                 .catch(error => {
+                    console.log(error)
                     let message = error.response.data.error
                     this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
                 });

@@ -55,6 +55,7 @@ export default {
         },
         viewLoanFundApplication(loanFundApplication) {
             // Redirect to the LoanApplicationDetails component with the selected loan application
+            console.log(loanFundApplication)
             this.$router.push({
                 name: 'LoanFundApplicationDetails',
                 params: {

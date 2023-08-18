@@ -79,19 +79,6 @@ class LoanFundApplication(models.Model):
     amount = models.DecimalField(null=False, max_digits=18, decimal_places=2)
     status = models.CharField(max_length=50, null=False, choices=STATUS_CHOICES, default="Pending")
 
-    # def save(self, *args, **kwargs):
-    #     total_loans = CustomUser.objects.aggregate(Sum('loan_amount'))['loan_amount__sum'] or 0
-    #     total_funds = LoanFundApplication.objects.filter(status='Approved').aggregate(Sum('amount'))['amount__sum'] or 0
-
-    #     if self.status == 'Approved':
-    #         total_funds += self.amount
-            
-    #     if total_loans > total_funds:
-    #         raise ValidationError("Total loans exceed total funds.")
-
-    #     super().save(*args, **kwargs)
-
-
 class LoanPayment(models.Model):
     loan_customer = models.ForeignKey(settings.AUTH_USER_MODEL,related_name="loan_payment_loan_customer" , on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=18, decimal_places=2)

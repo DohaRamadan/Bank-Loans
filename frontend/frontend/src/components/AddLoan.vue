@@ -61,7 +61,7 @@ export default {
                     this.$router.push('/loans/view')
                 })
                 .catch(error => {
-                    console.log(error.response.data.error)
+                    console.log(error)
                     let message = ""; 
                     if (error.response.data.error.min_amount) {
                         message += "min_amount: "
