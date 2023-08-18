@@ -22,7 +22,7 @@ The bank should receive funds from loan providers and be able to lend its custom
 - Vuetify
 
 ## How to run it
-1- Make sure you have the necessary packages installed, you can find the necessary packages to run the backend project in backend\requirements.txt and you can find the necessary packages to run the frontend project in frontend\frontend\package.json
+1- Make sure you have the necessary packages installed, you can find the necessary packages to run the backend project in backend\requirements.txt and you can find the necessary packages to run the frontend project in frontend\frontend\package.json    
 2- After cloning the project to your GitHub directory, open your command prompt in the project directory     
 3- run the following commands    
 
@@ -31,11 +31,11 @@ The bank should receive funds from loan providers and be able to lend its custom
     python manage.py runserver  
 4- After running the previous commands go back to the project root directory using the following command    
 
-        cd ..
+    cd ..
 5- To run the frontend project, run the following commands    
 
-        cd frontend\frontend
-        yarn dev
+    cd frontend\frontend
+    yarn dev
     
   
 
