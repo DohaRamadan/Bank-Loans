@@ -56,14 +56,7 @@ export default {
                 })
                 .catch(error => {
                     // Handle error response
-                    const statusCode = error.response ? error.response.status : 500;
-                    // Handle error response
-                    this.$router.push({
-                        name: 'ErrorPage',
-                        params: {
-                            code: statusCode
-                        }
-                    });
+                    console.log(error); 
                 });
         },
         viewLoanApplication(loanApplication) {

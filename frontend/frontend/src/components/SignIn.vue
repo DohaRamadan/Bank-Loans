@@ -52,33 +52,33 @@ export default {
 
                                 // Redirect the user
                                 if (role === "Loan Customer") {
-                                    this.$router.push('/loan-applications/view').then(() => { this.$router.go() })
+                                    this.$router.push('/loan-applications/view').then(() => {
+                                        this.$router.go()
+                                    })
                                 } else if (role === 'Loan Provider') {
-                                    this.$router.push('/loan-fund-applications/view').then(() => { this.$router.go() })
+                                    this.$router.push('/loan-fund-applications/view').then(() => {
+                                        this.$router.go()
+                                    })
                                 } else if (role === 'Bank Personnel') {
-                                    this.$router.push('/loans/view').then(() => { this.$router.go() })
+                                    this.$router.push('/loans/view').then(() => {
+                                        this.$router.go()
+                                    })
                                 }
                             })
                             .catch(error => {
-                                console.error(error.response && error.response.data ? error.response.data.error : error);
-                                this.handleRequestError(error);
+                                this.handleRequestError(error)
                             });
                     }
                 })
                 .catch(error => {
-                    console.error(error.response && error.response.data ? error.response.data.error : error);
-                    this.handleRequestError(error);
+                    this.handleRequestError(error)
                 });
         },
         handleRequestError(error) {
-            const statusCode = error.response ? error.response.status : 500;
-            this.$router.push({
-                name: 'ErrorPage',
-                params: {
-                    code: statusCode
-                }
-            });
-        }
+            let message = error.response && error.response.data.non_field_errors ? error.response.data.non_field_errors[0] : '';
+            console.log(message);
+            this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
+        },
     }
 };
 </script>

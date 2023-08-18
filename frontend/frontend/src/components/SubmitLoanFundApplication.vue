@@ -38,13 +38,16 @@ export default {
                     this.$router.push('/loan-fund-applications/view')
                 })
                 .catch(error => {
-                    const statusCode = error.response ? error.response.status : 500;
-                    this.$router.push({
-                        name: 'ErrorPage',
-                        params: {
-                            code: statusCode
-                        }
-                    });
+                    console.log(error)
+                    let message = ""
+                    if (error.response.data.error.amount) {
+                        message += error.response.data.error.amount[0]
+                    }
+                    if(error.response.data.error.non_field_errors){
+                        message += error.response.data.error.non_field_errors[0] + "\n";
+                    }
+                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
+
                 });
 
             // Clear the form field

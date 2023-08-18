@@ -27,14 +27,12 @@ class LoanViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['POST'], url_path='submit')
     def add_loan(self, request, pk=None):
-        loan = Loan.objects.create(
-            min_amount=request.data.get('min_amount'), 
-            max_amount=request.data.get('max_amount'), 
-            interest_rate=request.data.get('interest_rate'), 
-            duration=request.data.get('duration'), 
-        )
-        serializer = self.get_serializer(loan)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=False, methods=['GET'], url_path='view')
     def list_all_loans(self, request):
@@ -61,14 +59,15 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['POST'], url_path='submit')
     def submit_loan_application(self, request, pk=None):
-        loan = Loan.objects.get(pk=request.data.get('loan'))
-        loan_application = LoanApplication.objects.create(
-            customer=request.user,
-            loan=loan,
-            amount=request.data.get('amount')
-        )
-        serializer = self.get_serializer(loan_application)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        data = request.data.copy()  # Create a copy of the request data
+        data['customer'] = request.user.pk  # Set the customer field,khj
+
+        serializer = self.get_serializer(data=data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['PUT'], url_path='update')
     def approve_or_reject_loan_application(self, request, pk=None):
@@ -79,11 +78,17 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
                 raise PermissionDenied("You're not authorized to perform this action")
             loan_application.status = status
             loan_application.bank_personnel = request.user
+            loan_customer = loan_application.customer
             if status == 'Approved':
-                loan_customer = loan_application.customer
                 loan_customer.loan_amount += loan_application.amount
                 loan_customer.save()
-            loan_application.save()
+            try:
+                loan_application.save()
+            except ValidationError as e:
+                loan_customer.loan_amount -= loan_application.amount
+                loan_customer.save()
+                return Response({'error': e.message_dict}, status=status.HTTP_400_BAD_REQUEST)            
+
             serializer = self.get_serializer(loan_application)
             return Response(serializer.data)
         return Response({'error': 'Invalid status.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -116,20 +121,20 @@ class LoanFundApplicationViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['POST'], url_path='submit')
     def submit_loan_fund_application(self, request, pk=None):
-        loan_fund_application = LoanFundApplication.objects.create(
-            customer=request.user,
-            amount=request.data.get('amount')
-        )
-        serializer = self.get_serializer(loan_fund_application)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        data = request.data.copy()  # Create a copy of the request data
+        data['customer'] = request.user.pk  # Set the customer field,khj
+        serializer = self.get_serializer(data=data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['PUT'], url_path='update')
     def approve_or_reject_loan_fund_application(self, request, pk=None):
         loan_fund_application = self.get_object()
         status = request.data.get('status')
         if status in ['Approved', 'Rejected']:
-            if request.user.role != 'Bank Personnel':
-                raise PermissionDenied("You're not authorized to perform this action")
             loan_fund_application.status = status
             loan_fund_application.bank_personnel = request.user
             loan_fund_application.save()
@@ -146,6 +151,7 @@ class LoanFundApplicationViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("You're not authorized to perform this action")
         serializer = self.get_serializer(loan_fund_applications, many=True)
         return Response(serializer.data)
+    
 
 
 

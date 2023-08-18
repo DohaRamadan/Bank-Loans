@@ -55,13 +55,8 @@ export default {
                     this.selectedStatus = response.data.status;
                 })
                 .catch(error => {
-                    const statusCode = error.response ? error.response.status : 500;
-                    this.$router.push({
-                        name: 'ErrorPage',
-                        params: {
-                            code: statusCode
-                        }
-                    });
+                    let message = error.response.data.error
+                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
                 });
         },
         updateLoanFundApplication() {
@@ -80,13 +75,8 @@ export default {
                     this.loanFundApplication.status = this.selectedStatus;
                 })
                 .catch(error => {
-                    const statusCode = error.response ? error.response.status : 500;
-                    this.$router.push({
-                        name: 'ErrorPage',
-                        params: {
-                            code: statusCode
-                        }
-                    });
+                    let message = error.response.data.error
+                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
                 });
         },
     },

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated 
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -18,7 +18,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login
-
+from .permissions import *
 
 User = get_user_model()
 
@@ -34,6 +34,7 @@ def signup(request):
 
 class SigninView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -44,8 +45,10 @@ class SigninView(APIView):
             token, _ = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
         else:
-            return Response({'error': 'Invalid credentials'}, status=401)
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         
+
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def getRole(request):
     if request.user.is_authenticated:
@@ -55,6 +58,7 @@ def getRole(request):
 
 # get Loan Application by ID
 @api_view(['GET'])
+@permission_classes([IsAuthenticated, IsBankPersonnel])
 def getLoanApplication(request, pk):
     try:
         loanApplication = LoanApplication.objects.get(id=pk)
@@ -65,6 +69,7 @@ def getLoanApplication(request, pk):
     
 # get Loan Fund Application by ID
 @api_view(['GET'])
+@permission_classes([IsAuthenticated, IsBankPersonnel])
 def getLoanFundApplication(request, pk):
     try:
         loanFundApplication = LoanFundApplication.objects.get(id=pk)
@@ -73,7 +78,8 @@ def getLoanFundApplication(request, pk):
     except:
         return Response({'error': 'Loan Fund Application does not exist'})
     
-# get user paid_amount 
+# get user loan_amount 
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def getLoanAmount(request):
     if request.user.is_authenticated:

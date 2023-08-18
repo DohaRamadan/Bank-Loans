@@ -50,15 +50,24 @@ export default {
                     }
                 })
                 .catch(error => {
-                    console.error(error.response.data);
-                    const statusCode = error.response ? error.response.status : 500;
-                    // Handle error response
-                    this.$router.push({
-                        name: 'ErrorPage',
-                        params: {
-                            code: statusCode
-                        }
-                    });
+                    let message = ""; 
+                    if (error.response.data.username) {
+                        message += "username: "
+                        message += error.response.data.username[0] + "\n";
+                    }
+                    if (error.response.data.password) {
+                        message += "password: "
+                        message += error.response.data.password[0] + "\n";
+                    }
+                    if (error.response.data.role) {
+                        message += "role: "
+                        message += error.response.data.role[0] + "\n";
+                    }
+                    if (error.response.data.email) {
+                        message += "email: "
+                        message += error.response.data.email[0] + "\n";
+                    }
+                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
                 });
         }
     }

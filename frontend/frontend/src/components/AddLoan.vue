@@ -61,14 +61,28 @@ export default {
                     this.$router.push('/loans/view')
                 })
                 .catch(error => {
-                    const statusCode = error.response ? error.response.status : 500;
-                    // Handle error response
-                    this.$router.push({
-                        name: 'ErrorPage',
-                        params: {
-                            code: statusCode
-                        }
-                    });
+                    console.log(error.response.data.error)
+                    let message = ""; 
+                    if (error.response.data.error.min_amount) {
+                        message += "min_amount: "
+                        message += error.response.data.error.min_amount[0] + "\n";
+                    }
+                    if (error.response.data.error.max_amount) {
+                        message += "max_amount: "
+                        message += error.response.data.error.max_amount[0] + "\n";
+                    }
+                    if (error.response.data.error.interest_rate) {
+                        message += "interest_rate: "
+                        message += error.response.data.error.interest_rate[0] + "\n";
+                    }
+                    if (error.response.data.error.duration) {
+                        message += "duration: "
+                        message += error.response.data.error.duration[0] + "\n";
+                    }
+                    if(error.response.data.error.non_field_errors){
+                        message += error.response.data.error.non_field_errors[0] + "\n";
+                    }
+                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
                 });
 
             // Clear the form fields

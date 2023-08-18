@@ -57,15 +57,8 @@ export default {
                     this.selectedStatus = response.data.status;
                 })
                 .catch(error => {
-                    // Handle error response
-                    const statusCode = error.response ? error.response.status : 500;
-                    // Handle error response
-                    this.$router.push({
-                        name: 'ErrorPage',
-                        params: {
-                            code: statusCode
-                        }
-                    });
+                    let message = error.response.data.error
+                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
                 });
         },
         updateLoanApplication() {
@@ -84,13 +77,8 @@ export default {
                     this.$router.push('/loan-applications/view')
                 })
                 .catch(error => {
-                    const statusCode = error.response ? error.response.status : 500;
-                    this.$router.push({
-                        name: 'ErrorPage',
-                        params: {
-                            code: statusCode
-                        }
-                    });
+                    let message = error.response.data.error
+                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
                 });
         },
     },

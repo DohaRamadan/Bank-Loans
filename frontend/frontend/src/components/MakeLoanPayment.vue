@@ -66,29 +66,22 @@ export default {
                             this.showSuccessAlert = true;
                         })
                         .catch(error => {
-                            console.log(error);
-                            const statusCode = error.response ? error.response.status : 500;
-                            // Handle error response
-                            if (statusCode === 400) {
-                                this.errorMessage = error.response.data.error;
-                            } else {
-                                this.$router.push({
-                                    name: 'ErrorPage',
-                                    params: {
-                                        code: statusCode
-                                    }
-                                });
-                            }
+                            let message = error.response.data.error
+                            this.$router.push({
+                                name: 'ErrorPage',
+                                query: {
+                                    errorMessage: message
+                                }
+                            });
                         });
                 })
                 .catch(error => {
-                    const statusCode = error.response ? error.response.status : 500;
-                    console.error(error);
-                    // Handle error response
+                    console.log(error.response.data.error)
+                    let message = error.response.data.error
                     this.$router.push({
                         name: 'ErrorPage',
-                        params: {
-                            code: statusCode
+                        query: {
+                            errorMessage: message
                         }
                     });
                 });

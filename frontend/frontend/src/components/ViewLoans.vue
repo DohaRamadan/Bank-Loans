@@ -59,14 +59,8 @@ export default {
                     this.loans = response.data;
                 })
                 .catch(error => {
-                    // Handle error response
-                    const statusCode = error.response ? error.response.status : 500;
-                    this.$router.push({
-                        name: 'ErrorPage',
-                        params: {
-                            code: statusCode
-                        }
-                    });
+                    let message = error.response.data.error
+                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
                 });
         },
     },

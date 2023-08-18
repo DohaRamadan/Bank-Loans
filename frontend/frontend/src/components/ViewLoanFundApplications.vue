@@ -49,13 +49,8 @@ export default {
                     this.loanFundApplications = response.data;
                 })
                 .catch(error => {
-                    // Handle error response
-                    this.$router.push({
-                        name: 'ErrorPage',
-                        params: {
-                            code: error.response.status
-                        }
-                    });
+                    let message = error.response.data.error
+                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
                 });
         },
         viewLoanFundApplication(loanFundApplication) {
