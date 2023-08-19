@@ -57,15 +57,8 @@ export default {
                     });
                 })
                 .catch((error) => {
-                    console.error('Logout request failed', error);
-                    const statusCode = error.response ? error.response.status : 500;
-                    // Handle error response
-                    this.$router.push({
-                        name: 'ErrorPage',
-                        params: {
-                            code: statusCode,
-                        },
-                    });
+                    let message = error.response.data.error
+                    this.$router.push({name:'ErrorPage',query: { errorMessage: message }})
                 });
         },
     },
